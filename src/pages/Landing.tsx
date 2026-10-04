@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useBoardState } from "@/state/StoryboardProvider";
-import { useStream } from "@/state/StoryboardProvider";
+import { GenerationProgress } from "@/features/generate/GenerationProgress";
+import { useBoardState, useStream } from "@/state/StoryboardProvider";
 
 const EXAMPLES = [
   "A habit tracker with streaks and reminders",
@@ -33,7 +33,8 @@ function useTheme() {
 export default function Landing() {
   const navigate = useNavigate();
   const { stories } = useBoardState();
-  const { generate, status } = useStream();
+  const { generate, status, statusMessage, count, titles, text, stop, clear } =
+    useStream();
   const { dark, toggle } = useTheme();
 
   const [idea, setIdea] = useState("");
@@ -44,6 +45,15 @@ export default function Landing() {
   }, []);
 
   const streaming = status === "streaming";
+
+  // Once a run finishes cleanly with at least one story, head to the board
+  // after a short beat so the user can see the completed summary.
+  useEffect(() => {
+    if (status === "done" && count > 0) {
+      const timer = setTimeout(() => navigate("/board"), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, count, navigate]);
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setIdea(e.target.value);
@@ -60,7 +70,6 @@ export default function Landing() {
     const trimmed = idea.trim();
     if (trimmed.length === 0 || streaming) return;
     await generate(trimmed);
-    navigate("/board");
   };
 
   return (
@@ -139,18 +148,30 @@ export default function Landing() {
           </div>
         </Card>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          {EXAMPLES.map((example) => (
-            <button
-              key={example}
-              type="button"
-              onClick={() => setIdea(example)}
-              className="rounded-full border border-dashed px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
-            >
-              {example}
-            </button>
-          ))}
-        </div>
+        {status === "idle" ? (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {EXAMPLES.map((example) => (
+              <button
+                key={example}
+                type="button"
+                onClick={() => setIdea(example)}
+                className="rounded-full border border-dashed px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <GenerationProgress
+            status={status}
+            statusMessage={statusMessage}
+            count={count}
+            titles={titles}
+            text={text}
+            onStop={stop}
+            onStartOver={clear}
+          />
+        )}
       </main>
     </div>
   );
