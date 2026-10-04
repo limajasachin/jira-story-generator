@@ -1,3 +1,4 @@
+import { useDraggable } from "@dnd-kit/core";
 import type { ColumnId, Story } from "@shared/protocol";
 import { Badge } from "@/components/ui/badge";
 import { COLUMNS } from "./boardReducer";
@@ -21,15 +22,46 @@ export function StoryCard({
 }: StoryCardProps) {
   const index = COLUMNS.findIndex((c) => c.id === column);
 
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: story.id,
+      // The source column travels with the drag, so drop can diff
+      // from/to without re-looking the story up.
+      data: { column },
+    });
+
   return (
-    <div className="rounded-md border bg-card p-3 text-card-foreground shadow-sm">
-      <button
-        type="button"
-        className="text-left text-sm font-medium hover:underline"
-        onClick={() => onOpenStory(story)}
-      >
-        {story.title}
-      </button>
+    <div
+      ref={setNodeRef}
+      style={
+        transform
+          ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+          : undefined
+      }
+      className={`rounded-md border bg-card p-3 text-card-foreground shadow-sm ${
+        isDragging ? "opacity-40" : ""
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <button
+          type="button"
+          className="text-left text-sm font-medium hover:underline"
+          onClick={() => onOpenStory(story)}
+        >
+          {story.title}
+        </button>
+        {/* Drag handle: only this grip drags, so clicks elsewhere
+            (title, buttons) keep their own behaviour. */}
+        <button
+          type="button"
+          {...listeners}
+          {...attributes}
+          aria-label={`Drag ${story.title}`}
+          className="cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
+        >
+          ⠿
+        </button>
+      </div>
 
       <div className="mt-2 flex items-center gap-1">
         <Badge variant="outline">{story.kind}</Badge>
