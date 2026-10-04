@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ function useTheme() {
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { stories } = useBoardState();
   const { generate, status, statusMessage, count, titles, text, stop, clear } =
     useStream();
@@ -43,6 +44,12 @@ export default function Landing() {
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);
+
+  // Prefill from /?idea=… (used by "Run again" on the board page).
+  useEffect(() => {
+    const idea = searchParams.get("idea");
+    if (idea) setIdea(idea);
+  }, [searchParams]);
 
   const streaming = status === "streaming";
 

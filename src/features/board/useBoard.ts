@@ -1,6 +1,8 @@
-import { useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer } from "react";
+import { toast } from "sonner";
 import type { BoardState, ColumnId, Story } from "@shared/protocol";
 import { boardReducer } from "./boardReducer";
+import { saveMove } from "@/api/board";
 
 const STORAGE_KEY = "jira.board.v1";
 
@@ -55,6 +57,21 @@ function initBoard(): BoardState {
 export function useBoard() {
   const [board, dispatch] = useReducer(boardReducer, undefined, initBoard);
 
+  // Optimistic move: apply instantly, persist in the background, and
+  // roll back with a toast if the save fails.
+  const moveStory = useCallback(
+    async (id: string, to: ColumnId, from: ColumnId) => {
+      dispatch({ type: "move", id, from, to });
+      try {
+        await saveMove(id, to);
+      } catch {
+        dispatch({ type: "move", id, from: to, to: from });
+        toast.error("Move failed — changes reverted");
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(board));
   }, [board]);
@@ -73,5 +90,5 @@ export function useBoard() {
     done: board.done.length,
   };
 
-  return { board, dispatch, counts, total, points };
+  return { board, dispatch, moveStory, counts, total, points };
 }
