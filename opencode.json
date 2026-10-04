@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      "composio": {
+        "type": "remote",
+        "url": "https://connect.composio.dev/mcp",
+        "enabled": true
+      }
+    }
+  }
+}

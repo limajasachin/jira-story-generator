@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@custom-variant data-open (&[data-open]);
+@custom-variant data-closed (&[data-closed]);
+@custom-variant data-active (&[data-active]);
+@custom-variant data-horizontal (&[data-horizontal]);
+@custom-variant data-vertical (&[data-vertical]);
+@custom-variant data-disabled (&[data-disabled]);
+@custom-variant data-placeholder (&[data-placeholder]);
+
+@theme {
+  /* ── Teal → Emerald palette ─────────────────────────────── */
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
+
+  --color-primary: #0f766e;
+  --color-primary-foreground: #f0fdfa;
+
+  --color-secondary: #ecfdf5;
+  --color-secondary-foreground: #064e3b;
+
+  --color-accent: #10b981;
+  --color-accent-foreground: #022c22;
+
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0f172a;
+
+  --color-input: #e2e8f0;
+  --color-ring: #14b8a6;
+
+  --color-border: #e2e8f0;
+
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #fef2f2;
+
+  /* ── Status / column colors ─────────────────────────────── */
+  --color-todo: #94a3b8;
+  --color-doing: #f59e0b;
+  --color-done: #10b981;
+
+  /* ── App-level tokens ───────────────────────────────────── */
+  --brand-gradient: linear-gradient(135deg, #0f766e 0%, #10b981 100%);
+  --column-todo: #e2e8f0;
+  --column-doing: #fef3c7;
+  --column-done: #d1fae5;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+.dark {
+  --color-background: #0f172a;
+  --color-foreground: #f1f5f9;
+
+  --color-primary: #14b8a6;
+  --color-primary-foreground: #042f2e;
+
+  --color-secondary: #064e3b;
+  --color-secondary-foreground: #d1fae5;
+
+  --color-accent: #34d399;
+  --color-accent-foreground: #022c22;
+
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+
+  --color-card: #1e293b;
+  --color-card-foreground: #f1f5f9;
+
+  --color-popover: #1e293b;
+  --color-popover-foreground: #f1f5f9;
+
+  --color-input: #334155;
+  --color-ring: #2dd4bf;
+
+  --color-border: #334155;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fef2f2;
+
+  --color-todo: #475569;
+  --color-doing: #d97706;
+  --color-done: #059669;
+
+  --brand-gradient: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+  --column-todo: #1e293b;
+  --column-doing: #451a03;
+  --column-done: #064e3b;
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(20, 184, 166, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(16, 185, 129, 0.06), transparent);
+  background-attachment: fixed;
+}
+
+/* ── Streaming caret blink ────────────────────────────────── */
+@keyframes streaming-caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.streaming-caret {
+  animation: streaming-caret-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaming-caret {
+    animation: none;
+  }
+}
