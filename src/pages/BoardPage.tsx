@@ -5,6 +5,7 @@ import { Board } from "@/features/board/Board";
 import { columnOf } from "@/features/board/boardReducer";
 import { StoryDialog } from "@/features/board/StoryDialog";
 import { StreamBanner } from "@/features/board/StreamBanner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -107,9 +108,15 @@ export default function BoardPage() {
             </div>
           ) : (
             <Board board={visibleBoard} onOpenStory={openStory} onMove={moveStory}>
-              <Board.Column id="todo" />
-              <Board.Column id="doing" />
-              <Board.Column id="done" />
+              <ErrorBoundary label="To Do column">
+                <Board.Column id="todo" />
+              </ErrorBoundary>
+              <ErrorBoundary label="In Progress column">
+                <Board.Column id="doing" />
+              </ErrorBoundary>
+              <ErrorBoundary label="Done column">
+                <Board.Column id="done" />
+              </ErrorBoundary>
             </Board>
           )}
         </TabsContent>
