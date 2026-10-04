@@ -1,7 +1,7 @@
-import type { Story } from "@shared/protocol";
-import type { StreamHandle } from "./protocol";
-import { generateFromTemplates } from "./templates";
-import { generateFromOpenRouter } from "./openrouter";
+import type { Story } from "../shared/protocol.js";
+import type { StreamHandle } from "./protocol.js";
+import { generateFromTemplates } from "./templates.js";
+import { generateFromOpenRouter } from "./openrouter.js";
 
 // ── Idea validation ──────────────────────────────────────────
 

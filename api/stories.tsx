@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { openStream } from "../server/protocol";
-import { generateStories } from "../server/stories-core";
+import { openStream } from "../server/protocol.js";
+import { generateStories } from "../server/stories-core.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {

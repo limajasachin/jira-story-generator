@@ -1,6 +1,6 @@
-import type { Story } from "@shared/protocol";
-import type { StreamHandle } from "./protocol";
-import { toStory } from "./protocol";
+import type { Story } from "../shared/protocol.js";
+import type { StreamHandle } from "./protocol.js";
+import { toStory } from "./protocol.js";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 

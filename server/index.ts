@@ -1,7 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
-import { openStream } from "./protocol";
-import { generateStories, saveMove, health } from "./stories-core";
+import { openStream } from "./protocol.js";
+import { generateStories, saveMove, health } from "./stories-core.js";
 
 const app = express();
 const port = 8789;

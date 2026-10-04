@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import type { Story, StreamMessage } from "@shared/protocol";
-import type { StreamHandle } from "./protocol";
+import type { Story, StreamMessage } from "../shared/protocol.js";
+import type { StreamHandle } from "./protocol.js";
 
 const TOKEN_DELAY_MS = 18;
 const CHARS_PER_TOKEN = 3;

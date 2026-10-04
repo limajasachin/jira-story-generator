@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import type { Story, StreamMessage } from "@shared/protocol";
+import type { Story, StreamMessage } from "../shared/protocol.js";
 
 export interface StreamHandle {
   emit: (message: StreamMessage) => void;
