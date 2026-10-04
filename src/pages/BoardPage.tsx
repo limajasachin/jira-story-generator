@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import type { ColumnId, Story } from "@shared/protocol";
+import type { BoardState, ColumnId, Story } from "@shared/protocol";
 import { Board } from "@/features/board/Board";
 import { columnOf } from "@/features/board/boardReducer";
 import { StoryDialog } from "@/features/board/StoryDialog";
 import { StreamBanner } from "@/features/board/StreamBanner";
+import { useDebounce } from "@/hooks/useDebounce";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBoardState } from "@/state/StoryboardProvider";
 
@@ -19,6 +21,33 @@ export default function BoardPage() {
   const navigate = useNavigate();
   const { board, dispatch, moveStory, stories, history } = useBoardState();
   const [selected, setSelected] = useState<SelectedStory | null>(null);
+
+  // ── Search ──────────────────────────────────────────────────
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 300);
+
+  // Filter a copy — never the stored board.
+  const visibleBoard = useMemo<BoardState>(() => {
+    const q = debouncedQuery.trim().toLowerCase();
+    if (q === "") return board;
+
+    const matches = (s: Story) =>
+      s.title.toLowerCase().includes(q) ||
+      s.description.toLowerCase().includes(q) ||
+      s.labels.some((l) => l.toLowerCase().includes(q));
+
+    return Object.fromEntries(
+      Object.entries(board).map(([col, colStories]) => [
+        col,
+        colStories.filter(matches),
+      ]),
+    ) as BoardState;
+  }, [board, debouncedQuery]);
+
+  const visibleCount =
+    visibleBoard.todo.length + visibleBoard.doing.length + visibleBoard.done.length;
+  const searching = debouncedQuery.trim() !== "";
+  const noMatches = searching && visibleCount === 0;
 
   const openStory = (story: Story) => {
     setSelected({ story, column: columnOf(board, story.id) ?? "todo" });
@@ -52,11 +81,37 @@ export default function BoardPage() {
         </TabsList>
 
         <TabsContent value="board">
-          <Board board={board} onOpenStory={openStory} onMove={moveStory}>
-            <Board.Column id="todo" />
-            <Board.Column id="doing" />
-            <Board.Column id="done" />
-          </Board>
+          <div className="mb-4 flex items-center gap-3">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search titles, descriptions, labels…"
+              className="max-w-sm"
+            />
+            {searching && (
+              <span className="text-sm text-muted-foreground">
+                {visibleCount} of {stories.length}{" "}
+                {stories.length === 1 ? "story" : "stories"} match
+              </span>
+            )}
+          </div>
+
+          {noMatches ? (
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16">
+              <p className="text-muted-foreground">
+                No stories match “{debouncedQuery.trim()}”.
+              </p>
+              <Button variant="outline" size="sm" onClick={() => setQuery("")}>
+                Clear search
+              </Button>
+            </div>
+          ) : (
+            <Board board={visibleBoard} onOpenStory={openStory} onMove={moveStory}>
+              <Board.Column id="todo" />
+              <Board.Column id="doing" />
+              <Board.Column id="done" />
+            </Board>
+          )}
         </TabsContent>
 
         <TabsContent value="list">
